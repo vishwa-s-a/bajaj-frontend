@@ -47,7 +47,7 @@ function JsonInput() {
         setIsValidJson(true);
 
         try {
-            const response = await axios.post('http://localhost:3000/bfhl', JSON.parse(jsonInput));
+            const response = await axios.post('https://bajaj-backend-rusd.onrender.com/bfhl', JSON.parse(jsonInput));
             setApiResponse(response.data);
         } catch (error) {
             console.error('Error while calling API:', error);
