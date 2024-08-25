@@ -2,7 +2,7 @@ import JsonInput from "./components/JsonInput";
 
 export default function App() {
   return (
-    <main className="items-center w-full ">
+    <main className="flex flex-1 flex-col justify-center items-center w-full h-[100vh]">
     <JsonInput/>
   </main>
   )

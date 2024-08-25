@@ -18,6 +18,17 @@ function JsonInput() {
         setJsonInput(event.target.value);
     };
 
+    const customStyles = {
+        control: (provided, state) => ({
+            ...provided,
+            boxShadow: 'none',        // Remove the default outline (box shadow)
+            borderColor: state.isFocused ? 'white' : 'white', // Optional: Customize border color on focus
+            '&:hover': {
+                borderColor: state.isFocused ? 'white' : 'white', // Customize hover effect
+            },
+        }),
+    };
+
     const validateJson = (input) => {
         try {
             JSON.parse(input);
@@ -36,7 +47,7 @@ function JsonInput() {
         setIsValidJson(true);
 
         try {
-            const response = await axios.post('https://bajaj-backend-rusd.onrender.com/bfhl', JSON.parse(jsonInput));
+            const response = await axios.post('http://localhost:3000/bfhl', JSON.parse(jsonInput));
             setApiResponse(response.data);
         } catch (error) {
             console.error('Error while calling API:', error);
@@ -49,13 +60,25 @@ function JsonInput() {
 
     const renderResponse = () => {
         if (!apiResponse || selectedOptions.length === 0) return null;
-
+        
         const renderedData = selectedOptions.map(option => {
             if (option.value in apiResponse) {
+                // console.log(apiResponse[option.value]['2'])
+                // console.log(apiResponse[option.value].length)
+                let ans=' '
+                for(let i in apiResponse[option.value]){
+                    ans+=apiResponse[option.value][i]
+                    if(i != (apiResponse[option.value].length)-1){
+                        ans+=","
+                    }
+                }
+                
                 return (
                     <div key={option.value}>
-                        <h3>{option.label}</h3>
-                        <pre>{JSON.stringify(apiResponse[option.value], null, 2)}</pre>
+                        <p className='font-sm text-lg'>{option.label} : 
+                            {ans}
+                        </p>
+                        {/* <pre>{JSON.stringify(apiResponse[option.value], null, 2)}</pre> */}
                     </div>
                 );
             }
@@ -66,32 +89,47 @@ function JsonInput() {
     };
 
     return (
-        <div className='flex flex-1 justify-center flex-col items-center mt-4 p-4'>
-            <form onSubmit={handleSubmit}>
-                <p className=' font-medium font-montserrat'>API Input</p>
-                <textarea
+        <div className='flex flex-1 flex-col items-center gap-8 w-[60vw] p-0 mt-40'>
+            <form onSubmit={handleSubmit} className='w-full p-0 m-0 box-border'>
+
+                <div className='border-solid border-2 border-sky-100 rounded-md w-full h-[60px] p-3 '>
+                    <p className='relative top-[-25px] font-medium font-montserrat text-slate-500 bg-white w-max'>API Input</p>
+                    <input type='text'
+                        value={jsonInput}
+                        onChange={handleInputChange}
+                        className=' relative top-[-15px] text-xl outline-none focus:border-blue-500'>
+
+                    </input>
+                </div>
+
+                {/* <textarea
                     rows="4"
                     cols="50"
                     value={jsonInput}
                     onChange={handleInputChange}
                     placeholder='API input here'
                     className='border-solid border-2 border-sky-100 rounded-sm w-full'
-                />
+                /> */}
                 <br />
-                <button type="submit" className="flex justify-center items-center gap-2 px-7 py-4 border rounded-lg font-montserrat
-                    text-lg leading-none bg-blue-700 w-full">Submit</button>
+                <button type="submit" className="gap-2 px-7 py-4 border rounded-lg font-montserrat
+                    text-lg leading-none bg-blue-700 w-full text-white font-bold ">Submit</button>
                 {!isValidJson && <p style={{ color: 'red' }}>Invalid JSON format</p>}
             </form>
             {apiResponse && (
-                <div className="">
-                    <h2>Select what to display:</h2>
-                    <Select
-                        isMulti
-                        options={options}
-                        onChange={handleSelectChange}
-                    />
-                    <div className="response-data">
-                        {renderResponse()}
+                <div className="w-full top-20">
+                    <div className='border-solid border-2 border-sky-100 rounded-md w-full h-[60px] p-3 '>
+                        <p className='relative top-[-25px] font-medium font-montserrat text-slate-500 bg-white w-max'>Multi filter</p>
+                        <Select
+                            isMulti
+                            options={options}
+                            onChange={handleSelectChange}
+                            styles={customStyles}
+                            className='top-[-25px] ml-0'
+                        />
+                        <div className="response-data">
+                            <p className='font-md text-lg '>Filtered Response</p>
+                            {renderResponse()}
+                        </div>
                     </div>
                 </div>
             )}
